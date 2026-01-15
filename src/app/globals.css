@@ -1,0 +1,251 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 0, 0, 0;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: #000;
+  color: white;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* 스크롤바 커스터마이징 - 세련된 디자인 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track, rgba(15, 23, 42, 0.3));
+  border-radius: 10px;
+  margin: 4px 0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, rgba(14, 165, 233, 0.5));
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover, rgba(14, 165, 233, 0.8));
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: var(--scrollbar-thumb-hover, rgba(14, 165, 233, 1));
+  background-clip: padding-box;
+}
+
+/* Firefox 스크롤바 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb, rgba(14, 165, 233, 0.5)) var(--scrollbar-track, rgba(15, 23, 42, 0.3));
+}
+
+/* 글래스모피즘 유틸리티 */
+@layer utilities {
+  .glass {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-light {
+    background: rgba(30, 41, 59, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .glow-primary {
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.3),
+                0 0 40px rgba(14, 165, 233, 0.1);
+  }
+
+  .glow-accent {
+    box-shadow: 0 0 20px rgba(217, 70, 239, 0.3),
+                0 0 40px rgba(217, 70, 239, 0.1);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 10px currentColor;
+  }
+
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+}
+
+/* 캔버스 컨테이너 */
+.canvas-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+}
+
+/* UI 오버레이 */
+.ui-overlay {
+  position: fixed;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.ui-overlay > * {
+  pointer-events: auto;
+}
+
+/* 버튼 스타일 */
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 ease-out;
+  @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-dark-900;
+}
+
+.btn-primary {
+  @apply bg-primary-600 hover:bg-primary-500 text-white;
+  @apply shadow-lg shadow-primary-900/30;
+}
+
+.btn-secondary {
+  @apply bg-dark-700 hover:bg-dark-600 text-white;
+  @apply border border-dark-600;
+}
+
+.btn-ghost {
+  @apply bg-transparent hover:bg-dark-800/50 text-white;
+}
+
+.btn-icon {
+  @apply p-2 rounded-lg transition-all duration-200;
+  @apply hover:bg-dark-800/50 active:scale-95;
+}
+
+/* 인풋 스타일 */
+.input {
+  @apply w-full px-4 py-2 rounded-lg bg-dark-800/50 border border-dark-600;
+  @apply text-white placeholder-dark-400;
+  @apply focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500;
+  @apply transition-all duration-200;
+}
+
+/* 슬라이더 스타일 */
+.slider {
+  @apply w-full h-2 rounded-full bg-dark-700 appearance-none cursor-pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  @apply appearance-none w-4 h-4 rounded-full bg-primary-500 cursor-pointer;
+  @apply shadow-lg shadow-primary-500/30;
+  @apply hover:bg-primary-400 transition-colors;
+}
+
+.slider::-moz-range-thumb {
+  @apply w-4 h-4 rounded-full bg-primary-500 cursor-pointer border-none;
+  @apply shadow-lg shadow-primary-500/30;
+}
+
+/* 토글 스위치 */
+.toggle {
+  @apply relative inline-flex h-6 w-11 items-center rounded-full;
+  @apply bg-dark-600 transition-colors duration-200;
+}
+
+.toggle.active {
+  @apply bg-primary-600;
+}
+
+.toggle-thumb {
+  @apply inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200;
+  @apply translate-x-1;
+}
+
+.toggle.active .toggle-thumb {
+  @apply translate-x-6;
+}
+
+/* 패널 스타일 */
+.panel {
+  @apply glass rounded-2xl p-4 shadow-2xl;
+}
+
+/* 애니메이션 */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* 로딩 스피너 */
+.spinner {
+  @apply w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin;
+}
+
+/* 드롭존 */
+.dropzone {
+  @apply border-2 border-dashed border-dark-500 rounded-xl p-8;
+  @apply transition-all duration-300 cursor-pointer;
+  @apply hover:border-primary-500 hover:bg-primary-500/5;
+}
+
+.dropzone.active {
+  @apply border-primary-400 bg-primary-500/10;
+}
+
+/* 탭 스타일 */
+.tab {
+  @apply px-4 py-2 rounded-lg text-sm font-medium;
+  @apply text-dark-400 transition-all duration-200;
+  @apply hover:text-white hover:bg-dark-800/50;
+}
+
+.tab.active {
+  @apply text-white bg-dark-800;
+}
+
+/* 카드 스타일 */
+.card {
+  @apply glass-light rounded-xl p-4 transition-all duration-200;
+  @apply hover:bg-dark-700/50;
+}
+
+/* 툴팁 */
+.tooltip {
+  @apply absolute z-50 px-2 py-1 text-xs text-white bg-dark-800 rounded;
+  @apply opacity-0 invisible transition-all duration-200;
+  @apply pointer-events-none;
+}
+
+.tooltip-trigger:hover .tooltip {
+  @apply opacity-100 visible;
+}
