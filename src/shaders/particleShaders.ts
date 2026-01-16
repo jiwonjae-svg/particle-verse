@@ -101,7 +101,7 @@ float snoise(vec3 v) {
   return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
 }
 
-vec3 applyEffect(vec3 pos, float time) {
+vec3 applyEffect(vec3 pos, vec3 originalPos, float time) {
   vec3 result = pos;
   float t = time * uSpeed;
   float intensity = uEffectIntensity;
@@ -115,13 +115,16 @@ vec3 applyEffect(vec3 pos, float time) {
     result.y += sin(pos.x * 0.5 + t) * intensity * 20.0;
     result.y += sin(pos.z * 0.5 + t * 0.8) * intensity * 15.0;
   }
-  // 2: spiral
+  // 2: spiral - originalPosition 기준으로 회전
   else if (uEffect == 2) {
-    float angle = t + length(pos.xz) * 0.1;
-    float radius = length(pos.xz);
-    result.x = cos(angle) * radius;
-    result.z = sin(angle) * radius;
-    result.y += sin(t + randomOffset * 6.28) * intensity * 10.0;
+    float angle = t * 0.5 + length(originalPos.xz) * 0.1;
+    float radius = length(originalPos.xz);
+    vec3 offset = vec3(
+      cos(angle) * radius - originalPos.x,
+      sin(t * 0.3 + randomOffset * 6.28) * intensity * 10.0,
+      sin(angle) * radius - originalPos.z
+    );
+    result = originalPos + offset * intensity;
   }
   // 3: explode
   else if (uEffect == 3) {
@@ -141,12 +144,16 @@ vec3 applyEffect(vec3 pos, float time) {
     result.y += snoise(pos * 0.02 + t * 0.5 + 100.0) * intensity * 30.0;
     result.z += snoise(pos * 0.02 + t * 0.5 + 200.0) * intensity * 30.0;
   }
-  // 6: vortex
+  // 6: vortex - originalPosition 기준으로 회전
   else if (uEffect == 6) {
-    float angle = t * 2.0 + pos.y * 0.05;
-    float radius = length(pos.xz);
-    result.x = cos(angle) * radius;
-    result.z = sin(angle) * radius;
+    float angle = t * 0.5 + originalPos.y * 0.05;
+    float radius = length(originalPos.xz);
+    vec3 offset = vec3(
+      cos(angle) * radius - originalPos.x,
+      0.0,
+      sin(angle) * radius - originalPos.z
+    );
+    result = originalPos + offset * intensity;
   }
   // 7: pulse
   else if (uEffect == 7) {
@@ -159,35 +166,39 @@ vec3 applyEffect(vec3 pos, float time) {
     result.x += sin(pos.y * 0.1 + t) * intensity * 15.0;
     result.z += cos(pos.y * 0.1 + t * 0.7) * intensity * 15.0;
   }
-  // 9: rotate
+  // 9: rotate - originalPosition 기준으로 회전 (속도 감소)
   else if (uEffect == 9) {
-    float angle = t * intensity;
+    vec3 rotated = originalPos;
+    float angle = t * 0.3 * intensity; // 속도를 0.3배로 감소
     float cosA = cos(angle);
     float sinA = sin(angle);
     
     // X축 회전
     if (uRotateAxisX) {
-      float newY = result.y * cosA - result.z * sinA;
-      float newZ = result.y * sinA + result.z * cosA;
-      result.y = newY;
-      result.z = newZ;
+      float newY = rotated.y * cosA - rotated.z * sinA;
+      float newZ = rotated.y * sinA + rotated.z * cosA;
+      rotated.y = newY;
+      rotated.z = newZ;
     }
     
     // Y축 회전
     if (uRotateAxisY) {
-      float newX = result.x * cosA - result.z * sinA;
-      float newZ = result.x * sinA + result.z * cosA;
-      result.x = newX;
-      result.z = newZ;
+      float newX = rotated.x * cosA - rotated.z * sinA;
+      float newZ = rotated.x * sinA + rotated.z * cosA;
+      rotated.x = newX;
+      rotated.z = newZ;
     }
     
     // Z축 회전
     if (uRotateAxisZ) {
-      float newX = result.x * cosA - result.y * sinA;
-      float newY = result.x * sinA + result.y * cosA;
-      result.x = newX;
-      result.y = newY;
+      float newX = rotated.x * cosA - rotated.y * sinA;
+      float newY = rotated.x * sinA + rotated.y * cosA;
+      rotated.x = newX;
+      rotated.y = newY;
     }
+    
+    // intensity에 따라 원본과 회전된 위치 사이를 보간
+    result = mix(originalPos, rotated, intensity);
   }
   // 10: float - 전체 객체가 풍선처럼 움직임
   else if (uEffect == 10) {
@@ -307,8 +318,8 @@ void main() {
   
   vec3 pos = basePosition + turbulence;
   
-  // 이펙트 적용
-  pos = applyEffect(pos, uTime);
+  // 이펙트 적용 (originalPosition 전달하여 회전 누적 방지)
+  pos = applyEffect(pos, basePosition, uTime);
   
   // 손 상호작용 적용
   pos = applyHandInteraction(pos);
